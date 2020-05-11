@@ -4,11 +4,18 @@
 
 #pragma once
 
+#include "BST.h"
+#include <iostream>
+#include <vector>
+#include <map>
+#include <queue>
+
+using namespace std;
 
 // CSearchAppDlg 대화 상자
 class CSearchAppDlg : public CDialogEx
 {
-// 생성입니다.
+	// 생성입니다.
 public:
 	CSearchAppDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
 
@@ -17,7 +24,7 @@ public:
 	enum { IDD = IDD_SEARCHAPP_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
 
@@ -25,10 +32,19 @@ public:
 protected:
 	HICON m_hIcon;
 
+	BST tree;
+	map<int, pair<int, int> > keys;
+
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	CEdit m_insertEdit;
+	afx_msg void OnBnClickedInsertButton();
+	CListBox m_listBox;
+	afx_msg void OnBnClickedInsertButton2();
+	CStatic m_pictureBox;
 };

@@ -6,13 +6,12 @@
 #include "framework.h"
 #include "SearchApp.h"
 #include "SearchAppDlg.h"
+#include "BST.h"
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
-
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
 class CAboutDlg : public CDialogEx
@@ -20,12 +19,12 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 대화 상자 데이터입니다.
+	// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
 // 구현입니다.
@@ -59,12 +58,17 @@ CSearchAppDlg::CSearchAppDlg(CWnd* pParent /*=nullptr*/)
 void CSearchAppDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_INSERT_EDIT, m_insertEdit);
+	DDX_Control(pDX, IDC_LIST3, m_listBox);
+	DDX_Control(pDX, IDC_PICTURE_BOX, m_pictureBox);
 }
 
 BEGIN_MESSAGE_MAP(CSearchAppDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_INSERT_BUTTON, &CSearchAppDlg::OnBnClickedInsertButton)
+	ON_BN_CLICKED(IDC_INSERT_BUTTON2, &CSearchAppDlg::OnBnClickedInsertButton2)
 END_MESSAGE_MAP()
 
 
@@ -153,3 +157,82 @@ HCURSOR CSearchAppDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+void CSearchAppDlg::OnBnClickedInsertButton()
+{
+	CString strData;
+	int data;
+
+	m_insertEdit.GetWindowTextW(strData);
+	if (strData.IsEmpty()) {
+		return;
+	}
+
+	data = _ttoi(strData);
+
+	tree.Insert(Element(data));
+	tree.getTreePoints(keys);
+
+	CRect rect;
+	m_pictureBox.GetClientRect(&rect);
+	CDC* pDC = m_pictureBox.GetWindowDC();
+	pDC->SetWindowExt(100, 100);
+	pDC->SetWindowExt(rect.Width(), rect.Height());
+	pDC->FillSolidRect(&rect, RGB(255, 255, 255));
+	for (const auto& _key : keys) {
+		CString temp;
+		int key = _key.first;
+		int x = _key.second.second;
+		int y = _key.second.first;
+		temp.Format(_T("%d"), key);
+		x = 30 * x;
+		y = 20 * y;
+		CRect bound(x - 1, y - 1, x + 31, y + 21);
+		CRect textLocation(x, y, x + 30, y + 20);
+		BstNode* _node = tree.Search(Element(key));
+		int _leftKey = -1, _rightKey = -1;
+		if (_node->LeftChild)
+			_leftKey = tree.Search(Element(_node->LeftChild->data.key))->data.key;
+		if (_node->RightChild)
+			_rightKey = tree.Search(Element(_node->RightChild->data.key))->data.key;
+
+		if (_leftKey != -1) {
+			int _key = _leftKey;
+			int key = keys.find(_key)->first;
+			int toX = 30 * keys.find(_key)->second.second;
+			int toY = 20 * keys.find(_key)->second.first;
+			cout << x + 31 << ", " << y + 21 << " ==> " << toX - 1 << ", " << toY - 1 << endl;
+			pDC->MoveTo(x + 31, y + 21);
+			pDC->LineTo(toX - 1, toY - 1);
+		}
+		if (_rightKey != -1) {
+			int _key = _rightKey;
+			int key = keys.find(_key)->first;
+			int toX = 30 * keys.find(_key)->second.second;
+			int toY = 20 * keys.find(_key)->second.first;
+			cout << x + 31 << ", " << y + 21 << " ==> " << toX - 1 << ", " << toY - 1 << endl;
+			pDC->MoveTo(x + 31, y + 21);
+			pDC->LineTo(toX - 1, toY - 1);
+
+		}
+		pDC->Rectangle(&bound);
+		pDC->DrawText(temp, &textLocation, DT_CENTER);
+	}
+	m_pictureBox.ReleaseDC(pDC);
+	UpdateWindow();
+}
+
+// TODO: display도 구현할 것!
+
+
+void CSearchAppDlg::OnBnClickedInsertButton2()
+{
+	vector<CString> v;
+	int i = 0;
+	tree.display(v);
+	m_listBox.ResetContent();
+	for (const auto& value : v) {
+		m_listBox.InsertString(i, value);
+		i++;
+	}
+}
