@@ -219,6 +219,7 @@ void CSearchAppDlg::OnBnClickedInsertButton()
 		pDC->DrawText(temp, &textLocation, DT_CENTER);
 	}
 	m_pictureBox.ReleaseDC(pDC);
+	m_insertEdit.SetWindowTextW(_T(""));
 	UpdateWindow();
 }
 
@@ -235,4 +236,15 @@ void CSearchAppDlg::OnBnClickedInsertButton2()
 		m_listBox.InsertString(i, value);
 		i++;
 	}
+}
+
+
+BOOL CSearchAppDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// enter
+	if ((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN)) {
+		OnBnClickedInsertButton();
+		return TRUE;
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
 }

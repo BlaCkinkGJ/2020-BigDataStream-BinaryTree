@@ -47,4 +47,5 @@ public:
 	CListBox m_listBox;
 	afx_msg void OnBnClickedInsertButton2();
 	CStatic m_pictureBox;
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
