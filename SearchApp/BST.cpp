@@ -161,7 +161,7 @@ bool BST::Insert(const Element& x)
 		q->RightChild = p;
 	}
 
-	if (this->root->LeftSize >= 5 || this->root->RightSize >= 5) {
+	if (this->root->LeftSize >= BALANCE_POINT || this->root->RightSize >= BALANCE_POINT) {
 		mid = findUnbalancedNode(this->root);
 		cout << "Key: " << mid->data.key << endl;
 	}
